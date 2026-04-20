@@ -8,6 +8,12 @@ MCP server for [LamaTok](https://lamatok.com) — TikTok data API. Available on 
 
 Auto-generates MCP tools from the LamaTok OpenAPI spec at startup, so every non-deprecated `GET` endpoint is exposed without hand-written wrappers. Tools map 1:1 to REST endpoints (`GET /v1/user/by/username` → `get_v1_user_by_username`).
 
+## Get 100 Free API Requests
+
+**[Sign up with this link](https://lamatok.com/p/s6kl8mtn)** and get **100 free LamaTok requests** — no credit card required. Enough to wire up the MCP server, try a few prompts in Claude/Cursor/Codex, and evaluate the data quality before committing.
+
+> **[Get your free 100 requests here](https://lamatok.com/p/s6kl8mtn)**
+
 ## Quick start
 
 1. Get an API key at [lamatok.com](https://lamatok.com).

@@ -88,7 +88,7 @@ async function main(): Promise<void> {
   );
 
   const server = new Server(
-    { name: "lamatok-mcp", version: "1.0.0" },
+    { name: "lamatok-mcp", version: "1.0.1" },
     { capabilities: { tools: {} } },
   );
 
