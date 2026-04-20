@@ -1,0 +1,55 @@
+{
+  "name": "lamatok-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for LamaTok — TikTok data API. Auto-generates tools from the LamaTok OpenAPI spec so every endpoint is instantly usable from Claude, Cursor, Codex, Zed, and Windsurf.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "lamatok-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && node -e \"try{require('fs').chmodSync('dist/index.js',0o755)}catch(e){}\"",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "node --import tsx --test test/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "lamatok",
+    "tiktok",
+    "tiktok-api",
+    "social-media",
+    "data-api",
+    "claude",
+    "cursor",
+    "codex",
+    "ai",
+    "model-context-protocol"
+  ],
+  "author": "LamaTok <support@lamatok.com>",
+  "license": "MIT",
+  "homepage": "https://lamatok.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subzeroid/lamatok-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/subzeroid/lamatok-mcp/issues"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
