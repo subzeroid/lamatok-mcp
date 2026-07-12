@@ -1,6 +1,7 @@
 {
   "name": "lamatok-mcp",
-  "version": "1.0.2",
+  "version": "1.0.3",
+  "mcpName": "io.github.subzeroid/lamatok-mcp",
   "description": "MCP server for LamaTok — TikTok data API. Auto-generates tools from the LamaTok OpenAPI spec so every endpoint is instantly usable from Claude, Cursor, Codex, Zed, and Windsurf.",
   "type": "module",
   "main": "dist/index.js",
