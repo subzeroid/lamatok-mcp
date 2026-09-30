@@ -19,7 +19,7 @@ const SPEC = {
     },
   },
   paths: {
-    "/v2/user/by/username": {
+    "/v1/user/by/username": {
       get: {
         summary: "Get user by username",
         tags: ["User Profile"],
@@ -28,6 +28,9 @@ const SPEC = {
           { $ref: "#/components/parameters/Cursor" },
         ],
       },
+    },
+    "/v2/hashtag/info": {
+      get: { summary: "Older variant", tags: ["User Profile"] },
     },
     "/v1/legacy": {
       get: { summary: "old", tags: ["Legacy"] },
@@ -102,17 +105,33 @@ describe("lamatok-mcp server (smoke)", () => {
       assert.equal((init as { serverInfo: { name: string } }).serverInfo.name, "lamatok-mcp");
       client.notify("notifications/initialized", {});
 
-      const list = (await client.request("tools/list", {})) as { tools: Array<{ name: string }> };
+      const list = (await client.request("tools/list", {})) as {
+        tools: Array<{
+          name: string;
+          description: string;
+          annotations?: { readOnlyHint?: boolean; openWorldHint?: boolean };
+        }>;
+      };
       const names = list.tools.map((t) => t.name);
       assert.ok(
-        names.includes("get_v2_user_by_username"),
-        `expected get_v2_user_by_username in ${names.join(",")}`,
+        names.includes("get_v1_user_by_username"),
+        `expected get_v1_user_by_username in ${names.join(",")}`,
       );
       assert.ok(!names.includes("get_v1_legacy"), "Legacy tag should be excluded by default");
       assert.ok(!names.includes("get_v1_system"), "System tag should be excluded by default");
+      assert.ok(
+        !names.includes("get_v2_hashtag_info"),
+        "endpoints outside the core set should be hidden by default",
+      );
+
+      const user = list.tools.find((t) => t.name === "get_v1_user_by_username")!;
+      assert.match(user.description, /^Get a TikTok profile by username/);
+      assert.match(user.description, /\(GET \/v1\/user\/by\/username\)$/);
+      assert.equal(user.annotations?.readOnlyHint, true);
+      assert.equal(user.annotations?.openWorldHint, true);
 
       const result = (await client.request("tools/call", {
-        name: "get_v2_user_by_username",
+        name: "get_v1_user_by_username",
         arguments: { username: "instagram" },
       })) as { content: Array<{ type: string; text: string }>; isError?: boolean };
 
@@ -120,7 +139,42 @@ describe("lamatok-mcp server (smoke)", () => {
       const payload = JSON.parse(result.content[0].text);
       assert.equal(payload.ok, true);
       assert.equal(payload.key, "test-key");
-      assert.equal(payload.path, "/v2/user/by/username?username=instagram");
+      assert.equal(payload.path, "/v1/user/by/username?username=instagram");
+
+      const apiCall = calls.findLast((c) => c.url.startsWith("/v1/user/by/username"))!;
+      assert.match(String(apiCall.headers["user-agent"]), /^lamatok-mcp\/\d+\.\d+\.\d+/);
+      const specCall = calls.findLast((c) => c.url === "/openapi.json")!;
+      assert.match(String(specCall.headers["user-agent"]), /^lamatok-mcp\//);
+    } finally {
+      await client.close();
+    }
+  });
+
+  it("exposes every endpoint with LAMATOK_TOOLS=all", async () => {
+    const client = await spawnServer({
+      LAMATOK_KEY: "test-key",
+      LAMATOK_URL: baseUrl,
+      LAMATOK_TOOLS: "all",
+    });
+
+    try {
+      await client.request("initialize", {
+        protocolVersion: "2024-11-05",
+        capabilities: {},
+        clientInfo: { name: "smoke", version: "0" },
+      });
+      client.notify("notifications/initialized", {});
+
+      const list = (await client.request("tools/list", {})) as {
+        tools: Array<{ name: string; description: string }>;
+      };
+      const names = list.tools.map((t) => t.name);
+      assert.ok(names.includes("get_v1_user_by_username"));
+      assert.ok(names.includes("get_v2_hashtag_info"), "all mode should expose non-core endpoints");
+      assert.ok(!names.includes("get_v1_legacy"), "Legacy stays excluded in all mode");
+
+      const older = list.tools.find((t) => t.name === "get_v2_hashtag_info")!;
+      assert.equal(older.description, "Older variant (GET /v2/hashtag/info)");
     } finally {
       await client.close();
     }
@@ -147,7 +201,7 @@ describe("lamatok-mcp server (smoke)", () => {
       client.notify("notifications/initialized", {});
 
       const result = (await client.request("tools/call", {
-        name: "get_v2_user_by_username",
+        name: "get_v1_user_by_username",
         arguments: { username: "instagram" },
       })) as { content: Array<{ text: string }>; isError?: boolean };
 
