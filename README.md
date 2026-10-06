@@ -109,6 +109,7 @@ Set `LAMATOK_TOOLS=all` to expose every non-deprecated endpoint instead — same
 | `LAMATOK_EXCLUDE_TAGS`       | Blacklist: additional tags to exclude (on top of `Legacy`, `System`, `/sys`)   | no       |
 | `LAMATOK_TIMEOUT_MS`         | Per-request timeout for API calls. Default: `30000`                            | no       |
 | `LAMATOK_SPEC_TIMEOUT_MS`    | Timeout for the startup spec fetch. Default: `60000`                           | no       |
+| `LAMATOK_SPEC_RETRY_DELAY_MS` | Base delay between the 3 startup spec fetch attempts. Default: `2000`        | no       |
 | `LAMATOK_MAX_RESPONSE_BYTES` | Max bytes read from each API response. Default: `10485760` (10 MB)             | no       |
 | `LAMATOK_MAX_SPEC_BYTES`     | Max bytes read from the OpenAPI spec. Default: `8388608` (8 MB)                | no       |
 
